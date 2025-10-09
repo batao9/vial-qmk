@@ -1,0 +1,27 @@
+#ifndef POINTING_DEVICE_SCLK_PIN
+#    define POINTING_DEVICE_SCLK_PIN F7
+#endif
+#ifndef POINTING_DEVICE_SDIO_PIN
+#    define POINTING_DEVICE_SDIO_PIN F6
+#endif
+#ifndef POINTING_DEVICE_CS_PIN
+#    define POINTING_DEVICE_CS_PIN B1
+#endif
+
+/* Also provide legacy-named macros just in case */
+#ifndef ADNS5050_SCLK_PIN
+#    define ADNS5050_SCLK_PIN POINTING_DEVICE_SCLK_PIN
+#endif
+#ifndef ADNS5050_SDIO_PIN
+#    define ADNS5050_SDIO_PIN POINTING_DEVICE_SDIO_PIN
+#endif
+#ifndef ADNS5050_CS_PIN
+#    define ADNS5050_CS_PIN POINTING_DEVICE_CS_PIN
+#endif
+
+#ifndef POINTING_DEVICE_INVERT_X
+#    define POINTING_DEVICE_INVERT_X
+#endif
+#ifndef POINTING_DEVICE_INVERT_Y
+#    define POINTING_DEVICE_INVERT_Y
+#endif
