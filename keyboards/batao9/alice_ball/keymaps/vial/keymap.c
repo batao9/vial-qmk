@@ -65,49 +65,33 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
 };
 
-keyevent_t encoder1_ccw = {
-    .key = (keypos_t){.row = 5, .col = 0},
-    .pressed = false
-};
+// 現在アクティブなレイヤから [row,col] のキーコードを取得し、タップする
+// Vial/VIA の動的キーマップを反映するため dynamic_keymap_get_keycode を使用
+static uint16_t keycode_at(uint8_t row, uint8_t col) {
+    keypos_t pos = (keypos_t){ .row = row, .col = col };
+    layer_state_t st = layer_state;
+    // 上位レイヤから透過でないキーを探索
+    while (st) {
+        uint8_t top = get_highest_layer(st);
+        uint16_t kc = dynamic_keymap_get_keycode(top, pos.row, pos.col);
+        if (kc != KC_TRNS) return kc;
+        st &= ~((layer_state_t)1u << top);
+    }
+    // 全て透過ならベースレイヤ
+    return dynamic_keymap_get_keycode(0, pos.row, pos.col);
+}
 
-keyevent_t encoder1_cw = {
-    .key = (keypos_t){.row = 5, .col = 1},
-    .pressed = false
-};
+static void tap_key_at(uint8_t row, uint8_t col) {
+    uint16_t kc = keycode_at(row, col);
+    if (kc == KC_NO) return;
+    tap_code16(kc);
+}
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
-    if (index == 0) { /* First encoder */
-        if (clockwise) {
-            encoder1_cw.pressed = true;
-            encoder1_cw.time = (timer_read() | 1);
-            action_exec(encoder1_cw);
-        } else {
-            encoder1_ccw.pressed = true;
-            encoder1_ccw.time = (timer_read() | 1);
-            action_exec(encoder1_ccw);
-        }
-    }
-
-    return true;
+    if (index != 0) return true;
+    tap_key_at(5, clockwise ? 1 : 0);
+    return false;
 }
-
-
-void matrix_scan_user(void) {
-
-    if (encoder_update_user(0, false)) {
-        encoder1_ccw.pressed = false;
-        encoder1_ccw.time = (timer_read() | 1);
-        action_exec(encoder1_ccw);
-    }
-
-    if (encoder_update_user(0, false)) {
-        encoder1_cw.pressed = false;
-        encoder1_cw.time = (timer_read() | 1);
-        action_exec(encoder1_cw);
-    }
-
-}
-
 
 
 layer_state_t layer_state_set_user(layer_state_t state) {
